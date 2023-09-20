@@ -12,11 +12,12 @@ import cv2
 from pixelwise_a3c_el import *
 
 # _/_/_/ paths _/_/_/
-TRAINING_DATA_PATH = "./data/training_LOL_eval15.txt"
-TESTING_DATA_PATH = "./data/training_LOL_eval15.txt"
-label_DATA_PATH = "./data/label_LOL_eval15.txt"
-IMAGE_DIR_PATH = "./"
+TRAINING_DATA_PATH = "./ReLLIE/data/training_LOL_eval15.txt"
+TESTING_DATA_PATH = "./ReLLIE/data/training_LOL_eval15.txt"
+LABEL_DATA_PATH = "./ReLLIE/data/label_LOL_eval15.txt"
+IMAGE_DIR_PATH = "./ReLLIE/"
 SAVE_PATH = "./model/test_"
+RESULT_PATH='./result/'
 
 # _/_/_/ training parameters _/_/_/
 LEARNING_RATE = 0.001
@@ -68,7 +69,7 @@ def test(loader, loader2, agent, fout):
         p = np.transpose(p, (1, 2, 0))
         img_path = loader.testing_path_infos[i]
         img_name = img_path.split('/')[2]
-        cv2.imwrite('./result_ex2/' + str(i) + '_output.png', p)
+        cv2.imwrite(RESULT_PATH + str(i) + '_output.png', p)
 
     # print("test total reward {a}, PSNR {b}".format(a=sum_reward*255/test_data_size, b=sum_psnr/test_data_size))
     # fout.write("test total reward {a}, PSNR {b}\n".format(a=sum_reward*255/test_data_size, b=sum_psnr/test_data_size))
@@ -84,8 +85,8 @@ def main(fout):
         CROP_SIZE)
 
     mini_batch_loader_label = MiniBatchLoader(
-        label_DATA_PATH,
-        label_DATA_PATH,
+        LABEL_DATA_PATH,
+        LABEL_DATA_PATH,
         IMAGE_DIR_PATH,
         CROP_SIZE)
 
@@ -102,7 +103,7 @@ def main(fout):
     optimizer.setup(model)
 
     agent = PixelWiseA3C(model, optimizer, EPISODE_LEN, GAMMA)
-    chainer.serializers.load_npz('./pretrained/model.npz', agent.model)
+    chainer.serializers.load_npz('./ReLLIE/pretrained/model.npz', agent.model)
     agent.act_deterministically = True
     agent.model.to_gpu()
 
