@@ -12,9 +12,9 @@ import cv2
 from pixelwise_a3c_el import *
 
 # _/_/_/ paths _/_/_/
-TRAINING_DATA_PATH = "./ReLLIE/data/training_LOL_eval15.txt"
-TESTING_DATA_PATH = "./ReLLIE/data/training_LOL_eval15.txt"
-LABEL_DATA_PATH = "./ReLLIE/data/label_LOL_eval15.txt"
+TRAINING_DATA_PATH = "./ReLLIE/data/low.txt"
+TESTING_DATA_PATH = "./ReLLIE/data/low.txt"
+LABEL_DATA_PATH = "./ReLLIE/data/high.txt"
 IMAGE_DIR_PATH = "./ReLLIE/"
 SAVE_PATH = "./model/test_"
 RESULT_PATH='./result/'
@@ -43,6 +43,7 @@ def test(loader, loader2, agent, fout):
     sum_reward = 0
     test_data_size = MiniBatchLoader.count_paths(TESTING_DATA_PATH)
     current_state = State.State((TEST_BATCH_SIZE, 1, CROP_SIZE, CROP_SIZE), MOVE_RANGE)
+    os.makedirs(RESULT_PATH, exist_ok=True)
     for i in range(0, test_data_size, TEST_BATCH_SIZE):
         raw_x = loader.load_testing_data(np.array(range(i, i + TEST_BATCH_SIZE)))
         # label = loader2.load_testing_data(np.array(range(i, i+TEST_BATCH_SIZE)))
