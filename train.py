@@ -13,12 +13,13 @@ from models import FFDNet
 import torch.nn as nn
 
 #_/_/_/ paths _/_/_/ 
-TRAINING_DATA_PATH          = "./data/training_LOL_eval15.txt"
-label_DATA_PATH          = "./data/label_LOL_eval15.txt"
-TESTING_DATA_PATH           = "./data/training_LOL_eval15.txt"
+TRAINING_DATA_PATH = "./ReLLIE/data/low.txt"
+TESTING_DATA_PATH = "./ReLLIE/data/low.txt"
+LABEL_DATA_PATH = "./ReLLIE/data/high.txt"
+IMAGE_DIR_PATH = "./ReLLIE/"
 
-IMAGE_DIR_PATH              = "./"
-SAVE_PATH            = "./model/ex7_"
+SAVE_PATH = "./model/test_1"
+RESULT_PATH='./train_result/'
  
 #_/_/_/ training parameters _/_/_/ 
 LEARNING_RATE    = 0.0005
@@ -44,6 +45,7 @@ def test(loader1,loader2, agent_el, agent_de, fout, model):
     sum_reward = 0
     test_data_size = MiniBatchLoader.count_paths(TESTING_DATA_PATH)
     current_state = State_de.State_de((TEST_BATCH_SIZE, 1, CROP_SIZE, CROP_SIZE), MOVE_RANGE, model)
+    os.makedirs(RESULT_PATH, exist_ok=True)
     for i in range(0, test_data_size, TEST_BATCH_SIZE):
         raw_x = loader1.load_testing_data(np.array(range(i, i+TEST_BATCH_SIZE)))
         label = loader2.load_testing_data(np.array(range(i, i+TEST_BATCH_SIZE)))
@@ -85,8 +87,8 @@ def main(fout):
         IMAGE_DIR_PATH, 
         CROP_SIZE)
     mini_batch_loader_label = MiniBatchLoader(
-        label_DATA_PATH,
-        label_DATA_PATH,
+        LABEL_DATA_PATH,
+        LABEL_DATA_PATH,
         IMAGE_DIR_PATH,
         CROP_SIZE)
 
