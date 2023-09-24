@@ -18,7 +18,7 @@ TESTING_DATA_PATH = "./ReLLIE/data/low.txt"
 LABEL_DATA_PATH = "./ReLLIE/data/high.txt"
 IMAGE_DIR_PATH = "./ReLLIE/"
 
-SAVE_PATH = "./model/test_1"
+SAVE_PATH = "./model/train_1/"
 RESULT_PATH='./train_result/'
  
 #_/_/_/ training parameters _/_/_/ 
@@ -201,6 +201,7 @@ def main(fout):
             test(mini_batch_loader,mini_batch_loader_label, agent_el, agent_de, fout, model)
 
         if episode % SNAPSHOT_EPISODES == 0:
+            print('Savving snapshot...')
             agent_el.save(SAVE_PATH+str(episode))
         
         if i+TRAIN_BATCH_SIZE >= train_data_size:

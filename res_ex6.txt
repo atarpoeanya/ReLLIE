@@ -1,0 +1,330 @@
+episode 1
+train total reward -9616.287006119808
+episode 2
+train total reward -9627.699290654886
+episode 3
+train total reward -9737.195715100272
+episode 4
+train total reward -9947.775793444955
+episode 5
+train total reward -10275.721986995213
+episode 6
+train total reward -10623.432736918801
+episode 7
+train total reward -10361.526688643557
+episode 8
+train total reward -7854.184153615025
+episode 9
+train total reward -3887.81517023761
+episode 10
+train total reward -2042.8551141759215
+episode 11
+train total reward -1265.5664752573937
+episode 12
+train total reward -1983.2424971492344
+episode 13
+train total reward -1631.4929486279539
+episode 14
+train total reward -732.1162749022261
+episode 15
+train total reward -735.3008233066374
+episode 16
+train total reward -729.2420193321896
+episode 17
+train total reward -689.4897026698789
+episode 18
+train total reward -1143.3647866810907
+episode 19
+train total reward -921.4250173243026
+episode 20
+train total reward -774.5318365223773
+episode 21
+train total reward -706.5108093698045
+episode 22
+train total reward -614.6950609468106
+episode 23
+train total reward -586.1182140722118
+episode 24
+train total reward -600.7462341057726
+episode 25
+train total reward -466.77102287300215
+episode 26
+train total reward -432.65700839012726
+episode 27
+train total reward -467.8840547643597
+episode 28
+train total reward -414.43272908725396
+episode 29
+train total reward -402.2200114463515
+episode 30
+train total reward -503.6530620440661
+episode 31
+train total reward -508.01836360353076
+episode 32
+train total reward -422.75557297619133
+episode 33
+train total reward -394.3600917050786
+episode 34
+train total reward -1141.8672663043972
+episode 35
+train total reward -426.57969680675836
+episode 36
+train total reward -402.3115141520461
+episode 37
+train total reward -378.223566982335
+episode 38
+train total reward -550.8230120835793
+episode 39
+train total reward -382.5813061990627
+episode 40
+train total reward -382.9547366483912
+episode 41
+train total reward -387.6252077861489
+episode 42
+train total reward -635.4665360767608
+episode 43
+train total reward -434.9749105935029
+episode 44
+train total reward -401.65135718319766
+episode 45
+train total reward -572.8894242437852
+episode 46
+train total reward -784.1606693298996
+episode 47
+train total reward -401.81424866321726
+episode 48
+train total reward -391.4376274138328
+episode 49
+train total reward -1890.1785441892753
+episode 50
+train total reward -376.167443907627
+episode 51
+train total reward -373.0459298291122
+episode 52
+train total reward -428.3340002611564
+episode 53
+train total reward -376.16635229567174
+episode 54
+train total reward -382.48095821674406
+episode 55
+train total reward -388.9383223247727
+episode 56
+train total reward -395.32128890280137
+episode 57
+train total reward -387.3732128254548
+episode 58
+train total reward -764.1882623571353
+episode 59
+train total reward -376.4718927385791
+episode 60
+train total reward -386.7739146226127
+episode 61
+train total reward -374.66506463179024
+episode 62
+train total reward -846.1493271401421
+episode 63
+train total reward -463.6483737734017
+episode 64
+train total reward -428.912042512188
+episode 65
+train total reward -363.84985193464024
+episode 66
+train total reward -383.4259820473839
+episode 67
+train total reward -367.69397242428994
+episode 68
+train total reward -748.7042523150863
+episode 69
+train total reward -366.4904552729727
+episode 70
+train total reward -412.3782273882453
+episode 71
+train total reward -452.7840090427631
+episode 72
+train total reward -370.36328833213605
+episode 73
+train total reward -365.93805652401466
+episode 74
+train total reward -368.11680020389747
+episode 75
+train total reward -359.31544157829234
+episode 76
+train total reward -383.29066679651424
+episode 77
+train total reward -557.9382336833255
+episode 78
+train total reward -357.5215796833361
+episode 79
+train total reward -1386.2750384196231
+episode 80
+train total reward -359.184726421893
+episode 81
+train total reward -1307.6139151236448
+episode 82
+train total reward -352.88567728494587
+episode 83
+train total reward -721.6805355991831
+episode 84
+train total reward -689.334953905583
+episode 85
+train total reward -369.89055252579595
+episode 86
+train total reward -408.94252765288593
+episode 87
+train total reward -475.62462987325466
+episode 88
+train total reward -560.840666332938
+episode 89
+train total reward -404.3768404152392
+episode 90
+train total reward -374.3215703444649
+episode 91
+train total reward -1068.9129693975913
+episode 92
+train total reward -940.1030757602122
+episode 93
+train total reward -1991.139428438907
+episode 94
+train total reward -424.08063608465585
+episode 95
+train total reward -361.6981272321504
+episode 96
+train total reward -427.2063244013874
+episode 97
+train total reward -357.85054176642416
+episode 98
+train total reward -363.5799141295744
+episode 99
+train total reward -1588.743917008109
+episode 100
+train total reward -466.5211749086383
+episode 101
+train total reward -361.4216162403813
+episode 102
+train total reward -361.978866110688
+episode 103
+train total reward -465.71842645320777
+episode 104
+train total reward -362.4221974136818
+episode 105
+train total reward -370.2342592337807
+episode 106
+train total reward -363.52062018291934
+episode 107
+train total reward -677.041595608011
+episode 108
+train total reward -372.5559762318678
+episode 109
+train total reward -1638.5957395718146
+episode 110
+train total reward -356.1936635153809
+episode 111
+train total reward -362.5096915488231
+episode 112
+train total reward -364.29185311342655
+episode 113
+train total reward -355.5783053984305
+episode 114
+train total reward -360.43472663971625
+episode 115
+train total reward -357.2392025174782
+episode 116
+train total reward -704.5892899685736
+episode 117
+train total reward -358.5029521748205
+episode 118
+train total reward -464.43925976111
+episode 119
+train total reward -361.96704438173845
+episode 120
+train total reward -366.46064863271306
+episode 121
+train total reward -361.6171309754749
+episode 122
+train total reward -369.04030553292
+episode 123
+train total reward -1830.9934491637005
+episode 124
+train total reward -1058.9487930782902
+episode 125
+train total reward -355.5356972539146
+episode 126
+train total reward -361.7374138765399
+episode 127
+train total reward -367.0793202450137
+episode 128
+train total reward -366.474930792149
+episode 129
+train total reward -1921.8318815215073
+episode 130
+train total reward -364.59409068537167
+episode 131
+train total reward -471.3982394352585
+episode 132
+train total reward -350.1832022995654
+episode 133
+train total reward -362.21015123813294
+episode 134
+train total reward -368.97615762316315
+episode 135
+train total reward -999.5855554309561
+episode 136
+train total reward -369.2273255558813
+episode 137
+train total reward -388.1830049351672
+episode 138
+train total reward -1149.555510955011
+episode 139
+train total reward -515.4431538429735
+episode 140
+train total reward -387.9543502157968
+episode 141
+train total reward -423.7210097549144
+episode 142
+train total reward -477.2783127246093
+episode 143
+train total reward -381.5092444580607
+episode 144
+train total reward -2895.0125158477113
+episode 145
+train total reward -2384.9734442966624
+episode 146
+train total reward -710.439911886309
+episode 147
+train total reward -3006.368225162244
+episode 148
+train total reward -373.63829298618214
+episode 149
+train total reward -374.70904791495013
+episode 150
+train total reward -1056.1112503749873
+episode 151
+train total reward -478.97676175744795
+episode 152
+train total reward -380.25189368841404
+episode 153
+train total reward -382.1703042207444
+episode 154
+train total reward -379.8284719582309
+episode 155
+train total reward -371.8215705961316
+episode 156
+train total reward -377.12507374268387
+episode 157
+train total reward -375.77939369872513
+episode 158
+train total reward -371.4377297350124
+episode 159
+train total reward -387.3286917768145
+episode 160
+train total reward -378.04190207990024
+episode 161
+train total reward -399.19213227914014
+episode 162
+train total reward -382.717856788508
+episode 163
+train total reward -380.79520482450226
+episode 164
+train total reward -371.01241140528964
+episode 165
+train total reward -369.79030986543125
