@@ -12,9 +12,9 @@ from models import FFDNet
 import torch.nn as nn
 
 # _/_/_/ paths _/_/_/
-TRAINING_DATA_PATH = "./ReLLIE/data/plasmo/low.txt"
-TESTING_DATA_PATH = "./ReLLIE/data/plasmo/low.txt"
-LABEL_DATA_PATH = "./ReLLIE/data/plasmo/high.txt"
+TRAINING_DATA_PATH = "./ReLLIE/data/low.txt"
+TESTING_DATA_PATH = "./ReLLIE/data/low.txt"
+LABEL_DATA_PATH = "./ReLLIE/data/high.txt"
 IMAGE_DIR_PATH = "./ReLLIE/"
 SAVE_PATH = "./model/test_1"
 RESULT_PATH='./result_de/'
@@ -96,7 +96,7 @@ def main(fout):
 
     # load ffdnet
     in_ch = 3
-    model_fn = 'ReLLIE/FFDNet_models/net_rgb.pth'
+    model_fn = 'FFDNet_models/net_rgb.pth'
     # Absolute path to model file
     model_fn = os.path.join(os.path.abspath(os.path.dirname(__file__)), \
                             model_fn)
