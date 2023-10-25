@@ -261,19 +261,7 @@ class PixelWiseA3C(agent.AttributeSavingMixin, agent.AsyncAgent):
         if self.process_idx == 0:
             logger.debug('t:%s r:%s a:%s pout_r:%s pout_g:%s pout_b:%s',
                          self.t, reward, action, pout_r, pout_g, pout_b)
-        # Update stats
-        #self.average_value += (
-        #    (1 - self.average_value_decay) *
-        #    (F.cast(vout.data, 'float32') - self.average_value))
-#############################
-            #(float(vout.data[0]) - self.average_value))
-#############################
-        #self.average_entropy += (
-        #    (1 - self.average_entropy_decay) *
-        #    (F.cast(pout.entropy.data, 'float32') - self.average_entropy))
-#############################
-            #(float(pout.entropy.data[0]) - self.average_entropy))
-        #return action
+
         return chainer.cuda.to_cpu(action)
 #############################
 

@@ -61,7 +61,9 @@ def test(loader1,loader2, agent_el, agent_de, fout, model):
                 current_state.step_de(action_de)
             reward = np.square(label - previous_image)*255 - np.square(label - current_state.image)*255
             sum_reward += np.mean(reward)*np.power(GAMMA,t)
-
+        a = action_el.astype(np.uint8)
+        a = np.transpose(a, (1,2,0))
+        cv2.imwrite(SAVE_PATH+str(i)+'_'+str(t)+'_action.png', a)
         agent_de.stop_episode()
 
         I = np.maximum(0,label)

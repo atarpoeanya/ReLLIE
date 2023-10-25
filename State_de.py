@@ -9,13 +9,20 @@ import os
 from models import FFDNet
 from torch.autograd import Variable
 import matplotlib.image as mpimg
-from PIL import Image
+from PIL import Image, ImageStat
+
+def relu(x):
+        x_ = x.copy()
+        x_[x_<0] = 0
+        return x_
 
 class State_de():
     def __init__(self, size, move_range, model):
         self.image = np.zeros(size,dtype=np.float32)
         self.move_range = move_range
         self.net = model
+
+    
     
     def reset(self, x):
         self.image = x
@@ -28,13 +35,31 @@ class State_de():
         moves = (move - neutral) / 20
         moved_image = np.zeros(self.image.shape, dtype=np.float32)
         # de = move[:, 3:, :, :]
+        # RGB channel deconvolution
         r = self.image[:, 0, :, :]
         g = self.image[:, 1, :, :]
         b = self.image[:, 2, :, :]
+        print(r)
+
         moved_image[:, 0, :, :] = r + (moves[:, 0, :, :]) * r * (1 - r)
         moved_image[:, 1, :, :] = g + (0.1 * moves[:, 1, :, :] + 0.9 * moves[:, 0, :, :]) * g * (1 - g)
         moved_image[:, 2, :, :] = b + (0.1 * moves[:, 2, :, :] + 0.9 * moves[:, 0, :, :]) * b * (1 - b)
         self.image = 0.8 * moved_image + 0.2 * self.image
+
+    def step_co(self, act):
+        neutral = 6
+        move = act.astype(np.float32)
+        moves = (move - neutral) / 20
+        # Init matrice
+        moved_image = np.zeros(self.image.shape, dtype=np.float32)
+        # Load image channel
+        image = self.image.copy()
+        stat = ImageStat.Stat(image)
+        mean = stat.mean
+        editted_ = (image-mean)*(move+1)+mean
+
+        editted_ = relu(editted_)
+        self.image = 1-relu(1-editted_)
 
     def step_de(self, act_b):
         pix_num = act_b.shape[1]*act_b.shape[2]
@@ -81,10 +106,4 @@ class State_de():
             # Estimate noise and subtract it to the input image
             im_noise_estim = self.net(imorig, nsigma)
             outim = torch.clamp(imorig - im_noise_estim, 0., 1.)
-            # outim = outim * 0.9 + imorig * 0.1
-            # output = np.squeeze(outim.cpu().detach().numpy()).transpose([2, 1, 0])
-            # output = (output * 255).astype('uint8')
-            # im = Image.fromarray(output, 'RGB')
-            # im.save('1.png')
             self.image[i] = outim.cpu().detach().numpy()
-            # self.image[i] = 0.8 * denoised_image + 0.2 * self.image[i]

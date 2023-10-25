@@ -37,6 +37,13 @@ GAMMA = 1.05 # discount factor
 N_ACTIONS = 27
 MOVE_RANGE = 27 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
 CROP_SIZE = 70
+
+# Loss multiplier
+W_SPA = 1
+W_EXP = 80
+W_TV = 200
+W_COL_RATE = 20
+#######################
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 GPU_ID = 0
 
@@ -169,21 +176,26 @@ def main(fout):
         
         for t in range(0, EPISODE_LEN):
             raw_tensor = torch.from_numpy(raw_x).cuda()
+            # Previous image state
             previous_image = current_state.image.copy()
+
             action_el = agent_el.act_and_train(current_state.image, reward_de)
             action_value = (action_el - 6)/20
             current_state.step_el(action_el)
+
             action_de = agent_de.act_and_train(current_state.image, reward_de)
             current_state.step_de(action_de)
+
             previous_image_tensor = torch.from_numpy(previous_image).cuda()
             current_state_tensor = torch.from_numpy(current_state.image).cuda()
+
             action_tensor = torch.from_numpy(action_value).cuda()
-            loss_spa_cur = torch.mean(L_spa(current_state_tensor, raw_tensor))
-            # loss_col_cur = 50 * torch.mean(L_color(current_state_tensor))
-            Loss_TV_cur = 200 * L_TV(action_tensor)
-            loss_exp_cur = 80 * torch.mean(L_exp(current_state_tensor))
-            loss_col_rate_pre = 20 * torch.mean(L_color_rate(previous_image_tensor, current_state_tensor))
-            # reward_previous = loss_spa_pre + loss_col_pre + loss_exp_pre + Loss_TV_pre + loss_col_rate_pre
+
+            loss_spa_cur = W_SPA * torch.mean(L_spa(current_state_tensor, raw_tensor))
+            Loss_TV_cur = W_TV * L_TV(action_tensor)
+            loss_exp_cur = W_EXP * torch.mean(L_exp(current_state_tensor))
+            loss_col_rate_pre = W_COL_RATE * torch.mean(L_color_rate(previous_image_tensor, current_state_tensor))
+            # REWARD DECLARATION
             reward_current = loss_spa_cur + loss_exp_cur + Loss_TV_cur + loss_col_rate_pre
             reward = - reward_current
             reward_de = reward.cpu().numpy()
