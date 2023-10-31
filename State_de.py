@@ -19,6 +19,7 @@ def relu(x):
 class State_de():
     def __init__(self, size, move_range, model):
         self.image = np.zeros(size,dtype=np.float32)
+        # (1, 3, 70, 70)
         self.move_range = move_range
         self.net = model
 
@@ -39,7 +40,7 @@ class State_de():
         r = self.image[:, 0, :, :]
         g = self.image[:, 1, :, :]
         b = self.image[:, 2, :, :]
-        print(r)
+        
 
         moved_image[:, 0, :, :] = r + (moves[:, 0, :, :]) * r * (1 - r)
         moved_image[:, 1, :, :] = g + (0.1 * moves[:, 1, :, :] + 0.9 * moves[:, 0, :, :]) * g * (1 - g)
@@ -47,19 +48,28 @@ class State_de():
         self.image = 0.8 * moved_image + 0.2 * self.image
 
     def step_co(self, act):
-        neutral = 6
-        move = act.astype(np.float32)
-        moves = (move - neutral) / 20
-        # Init matrice
-        moved_image = np.zeros(self.image.shape, dtype=np.float32)
-        # Load image channel
-        image = self.image.copy()
-        stat = ImageStat.Stat(image)
-        mean = stat.mean
-        editted_ = (image-mean)*(move+1)+mean
+        bgr_t = np.transpose(self.image, (0,2,3,1))
+        temp3 = np.zeros(bgr_t.shape, bgr_t.dtype)
+        # de = move[:, 3:, :, :]
+        # BGR channel deconvolution
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+        for i in range(0, 1):
+                temp = cv2.cvtColor(bgr_t[i], cv2.COLOR_RGB2HSV)
 
-        editted_ = relu(editted_)
-        self.image = 1-relu(1-editted_)
+                v_channel = (temp[...,2]*255).astype(np.uint8)
+                v_channel = clahe.apply(v_channel)
+
+                s_channel = (temp[...,1]*255).astype(np.uint8)
+                s_channel = clahe.apply(s_channel)
+
+
+                temp[...,2] = (v_channel/255).astype(np.float32)
+                temp[...,1] = (s_channel/255).astype(np.float32)
+                # (v_channel).astype(np.float32)
+                temp3[i] = cv2.cvtColor(temp, cv2.COLOR_HSV2RGB)
+                print(temp3[i])
+        bgr3 = np.transpose(temp3, (0,3,1,2))
+        self.image = bgr3
 
     def step_de(self, act_b):
         pix_num = act_b.shape[1]*act_b.shape[2]
