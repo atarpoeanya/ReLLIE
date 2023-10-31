@@ -33,6 +33,7 @@ class State_de():
     def step_el(self, act):
         neutral = 6
         move = act.astype(np.float32)
+        print(np.sum(move))
         moves = (move - neutral) / 20
         moved_image = np.zeros(self.image.shape, dtype=np.float32)
         # de = move[:, 3:, :, :]
@@ -47,12 +48,19 @@ class State_de():
         moved_image[:, 2, :, :] = b + (0.1 * moves[:, 2, :, :] + 0.9 * moves[:, 0, :, :]) * b * (1 - b)
         self.image = 0.8 * moved_image + 0.2 * self.image
 
-    def step_co(self, act):
+    def step_co(self, act_b):
+        pix_num = act_b.shape[1]
+        threshold = pix_num
         bgr_t = np.transpose(self.image, (0,2,3,1))
         temp3 = np.zeros(bgr_t.shape, bgr_t.dtype)
         # de = move[:, 3:, :, :]
         # BGR channel deconvolution
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+        if (threshold == 3):
+             limit = 0.5
+        else:
+             limit = 0
+        clahe = cv2.createCLAHE(clipLimit=limit, tileGridSize=(1,1))
+
         for i in range(0, 1):
                 temp = cv2.cvtColor(bgr_t[i], cv2.COLOR_RGB2HSV)
 
@@ -67,7 +75,6 @@ class State_de():
                 temp[...,1] = (s_channel/255).astype(np.float32)
                 # (v_channel).astype(np.float32)
                 temp3[i] = cv2.cvtColor(temp, cv2.COLOR_HSV2RGB)
-                print(temp3[i])
         bgr3 = np.transpose(temp3, (0,3,1,2))
         self.image = bgr3
 
