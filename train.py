@@ -22,14 +22,14 @@ SAVE_PATH = "./model/train_1/"
 RESULT_PATH='./train_result/'
  
 #_/_/_/ training parameters _/_/_/ 
-LEARNING_RATE    = 0.0005
-TRAIN_BATCH_SIZE = 32
+LEARNING_RATE    = 0.001
+TRAIN_BATCH_SIZE = 64
 TEST_BATCH_SIZE  = 1 #must be 1
 N_EPISODES           = 30000
-EPISODE_LEN = 10
+EPISODE_LEN = 5
 SNAPSHOT_EPISODES  = 500
 TEST_EPISODES = 500
-GAMMA = 1.05 # discount factor
+GAMMA = 0.95 # discount factor
 
 #noise setting
 
@@ -40,14 +40,28 @@ CROP_SIZE = 70
 
 # Loss multiplier
 W_SPA = 1
-W_EXP = 80
+W_EXP = 100
 W_TV = 200
 W_COL_RATE = 20
 #######################
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 GPU_ID = 0
 
-def test(loader1,loader2, agent_el, agent_de, agent_co, fout, model):
+def calculate_psnr(img1, img2, max_value=255):
+	
+    """"Calculating peak signal-to-noise ratio (PSNR) between two images."""
+    mse = np.mean((img1 - img2) ** 2)
+
+    # Calculate the maximum possible pixel value (Max)
+    # For 8-bit images
+    if mse == 0:
+      return 100
+    # Calculate PSNR using the formula
+    # return 20 * math.log10((max_value ** 2) / mse)
+    return 20 * math.log10((max_value)) - 10 * math.log10(mse)
+def ssim(img1,img2):
+
+def test(loader1,loader2, agent_el, agent_de,  fout, model):
     sum_psnr   = 0
     sum_reward = 0
     test_data_size = MiniBatchLoader.count_paths(TESTING_DATA_PATH)
@@ -67,7 +81,7 @@ def test(loader1,loader2, agent_el, agent_de, agent_co, fout, model):
             action_el = agent_el.act(current_state.image)
             current_state.step_el(action_el)
             
-            action_co = agent_co.act(current_state.image)
+            action_co = agent_de.act(current_state.image)
             current_state.step_de(action_co)
 
             action_de = agent_de.act(current_state.image)
@@ -76,7 +90,6 @@ def test(loader1,loader2, agent_el, agent_de, agent_co, fout, model):
             reward = np.square(label - previous_image)*255 - np.square(label - current_state.image)*255
             sum_reward += np.mean(reward)*np.power(GAMMA,t)
         agent_el.stop_episode()
-        agent_co.stop_episode()
         agent_de.stop_episode()
 
         I = np.maximum(0,label)
@@ -85,7 +98,7 @@ def test(loader1,loader2, agent_el, agent_de, agent_co, fout, model):
         p = np.minimum(1,p)
         I = (I*255).astype(np.uint8)
         p = (p*255).astype(np.uint8)
-        sum_psnr += cv2.PSNR(p, I)
+        sum_psnr += calculate_psnr(p, I)
         p = np.squeeze(p, axis=0)
         p = np.transpose(p, (1, 2, 0))
         cv2.imwrite('./result/' + str(i) + '_output.png', p)
@@ -146,7 +159,7 @@ def main(fout):
     agent_el.model.to_gpu()
 
     # load myfcn model for de
-    model_de = MyFCN_de.MyFcn_denoise(3)
+    model_de = MyFCN_de.MyFcn_denoise(3) # Action_space
 
     # _/_/_/ setup _/_/_/
 
@@ -155,13 +168,6 @@ def main(fout):
 
     agent_de = pixelwise_a3c_de.PixelWiseA3C(model_de, optimizer_de, EPISODE_LEN, GAMMA)
     agent_de.model.to_gpu()
-
-    # _/_/_/ setup _/_/_/
-    optimizer_co = pixelwise_a3c_de.chainer.optimizers.Adam(alpha=LEARNING_RATE)
-    optimizer_co.setup(model_de)
-
-    agent_co = pixelwise_a3c_de.PixelWiseA3C(model_de, optimizer_co, EPISODE_LEN, GAMMA)
-    agent_co.model.to_gpu()
 
     #_/_/_/ training _/_/_/
  
@@ -198,11 +204,13 @@ def main(fout):
             action_value = (action_el - 6)/20
             current_state.step_el(action_el)
 
-            action_co = agent_co.act_and_train(current_state.image, reward_de)
+            action_co = agent_de.act_and_train(current_state.image, reward_de)
             current_state.step_de(action_co)
+            print('action contrast', action_co.shape)
 
             action_de = agent_de.act_and_train(current_state.image, reward_de)
             current_state.step_de(action_de)      
+            print('action denoise', action_de.shape)
 
             previous_image_tensor = torch.from_numpy(previous_image).cuda()
             current_state_tensor = torch.from_numpy(current_state.image).cuda()
@@ -220,7 +228,6 @@ def main(fout):
             sum_reward += np.mean(reward_de) * np.power(GAMMA, t)
 
         agent_el.stop_episode_and_train(current_state.image, reward_de, True)
-        agent_co.stop_episode_and_train(current_state.image, reward_de, True)
         agent_de.stop_episode_and_train(current_state.image, reward_de, True)
 
         print("train total reward {a}".format(a=sum_reward))
@@ -229,13 +236,12 @@ def main(fout):
 
         if episode % TEST_EPISODES == 0:
             #_/_/_/ testing _/_/_/
-            test(mini_batch_loader,mini_batch_loader_label, agent_el, agent_de, agent_co, fout, model)
+            test(mini_batch_loader,mini_batch_loader_label, agent_el, agent_de, fout, model)
 
         if episode % SNAPSHOT_EPISODES == 0:
             print('Saving snapshot...')
             agent_el.save(SAVE_PATH+ "el_agent/" +str(episode))
             agent_de.save(SAVE_PATH+ "de_agent/" +str(episode))
-            agent_co.save(SAVE_PATH+ "co_agent/" +str(episode))
         
         if i+TRAIN_BATCH_SIZE >= train_data_size:
             i = 0
