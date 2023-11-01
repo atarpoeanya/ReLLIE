@@ -11,6 +11,7 @@ import pixelwise_a3c_el
 import MyFCN_el
 from models import FFDNet
 import torch.nn as nn
+import math
 
 #_/_/_/ paths _/_/_/ 
 TRAINING_DATA_PATH = "./ReLLIE/data/low.txt"
@@ -59,7 +60,6 @@ def calculate_psnr(img1, img2, max_value=255):
     # Calculate PSNR using the formula
     # return 20 * math.log10((max_value ** 2) / mse)
     return 20 * math.log10((max_value)) - 10 * math.log10(mse)
-def ssim(img1,img2):
 
 def test(loader1,loader2, agent_el, agent_de,  fout, model):
     sum_psnr   = 0
@@ -98,10 +98,10 @@ def test(loader1,loader2, agent_el, agent_de,  fout, model):
         p = np.minimum(1,p)
         I = (I*255).astype(np.uint8)
         p = (p*255).astype(np.uint8)
-        sum_psnr += calculate_psnr(p, I)
+        sum_psnr += cv2.PSNR(p, I)
         p = np.squeeze(p, axis=0)
         p = np.transpose(p, (1, 2, 0))
-        cv2.imwrite('./result/' + str(i) + '_output.png', p)
+        cv2.imwrite(RESULT_PATH + str(i) + '_output.png', p)
     print("test total reward {a}, PSNR {b}".format(a=sum_reward*255/test_data_size, b=sum_psnr/test_data_size))
     fout.write("test total reward {a}, PSNR {b}\n".format(a=sum_reward*255/test_data_size, b=sum_psnr/test_data_size))
     sys.stdout.flush()
@@ -206,11 +206,9 @@ def main(fout):
 
             action_co = agent_de.act_and_train(current_state.image, reward_de)
             current_state.step_de(action_co)
-            print('action contrast', action_co.shape)
 
             action_de = agent_de.act_and_train(current_state.image, reward_de)
             current_state.step_de(action_de)      
-            print('action denoise', action_de.shape)
 
             previous_image_tensor = torch.from_numpy(previous_image).cuda()
             current_state_tensor = torch.from_numpy(current_state.image).cuda()

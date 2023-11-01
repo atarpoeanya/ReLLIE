@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import cv2
- 
+import random
  
 class MiniBatchLoader(object):
  
@@ -43,7 +43,27 @@ class MiniBatchLoader(object):
  
     def load_testing_data(self, indices):
         return self.load_data(self.testing_path_infos, indices)
- 
+    
+    def reduce_brightness(input_image, brightness_range=(0.4, 0.6)):
+        """
+        Reduces the brightness of an image and saves it.
+
+        Parameters:
+        - input_image_path (str): The path to the input image.
+        - output_image_path (str): The path to save the output image.
+        - brightness_range (tuple): A tuple specifying the brightness reduction range (min, max).
+
+        Returns:
+        - None
+        """
+
+        # Generate a random factor within the specified brightness range
+        brightness_factor = random.uniform(brightness_range[0], brightness_range[1])
+
+        # Apply brightness reduction
+        img_brightness_reduced = np.clip(input_image * brightness_factor, 0, 255).astype(np.uint8)
+        return img_brightness_reduced
+
     # test ok
     def load_data(self, path_infos, indices, augment=False):
         mini_batch_size = len(indices)
@@ -59,7 +79,8 @@ class MiniBatchLoader(object):
                 if img is None:
                     raise RuntimeError("invalid image: {i}".format(i=path))
                 h, w, _ = img.shape
-
+                # Reduce brightness randomly on training data
+                img = self.reduce_brightness(img)
                 if np.random.rand() > 0.5:
                     img = np.fliplr(img)
 
