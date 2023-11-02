@@ -12,10 +12,10 @@ from models import FFDNet
 import torch.nn as nn
 
 # _/_/_/ paths _/_/_/
-TRAINING_DATA_PATH = "./ReLLIE/data/low.txt"
-TESTING_DATA_PATH = "./ReLLIE/data/low.txt"
-LABEL_DATA_PATH = "./ReLLIE/data/high.txt"
-IMAGE_DIR_PATH = "./ReLLIE/"
+TRAINING_DATA_PATH = "./data/low.txt"
+TESTING_DATA_PATH = "./data/low.txt"
+LABEL_DATA_PATH = "./data/high.txt"
+IMAGE_DIR_PATH = "./"
 SAVE_PATH = "./model/test_1"
 RESULT_PATH='./result_de/'
 
@@ -54,16 +54,19 @@ def test(loader1,loader2, agent_el, agent_de, fout, model):
 
         for t in range(0, EPISODE_LEN):
             previous_image = current_state.image.copy()
+
             action_el = agent_el.act(current_state.image)
             current_state.step_el(action_el)
+
+            action_de = agent_de.act(current_state.image)
+            current_state.step_co(action_de)
+            
             if t > 4:
                 action_de = agent_de.act(current_state.image)
                 current_state.step_de(action_de)
             reward = np.square(label - previous_image)*255 - np.square(label - current_state.image)*255
             sum_reward += np.mean(reward)*np.power(GAMMA,t)
-        a = action_el.astype(np.uint8)
-        a = np.transpose(a, (1,2,0))
-        cv2.imwrite(SAVE_PATH+str(i)+'_'+str(t)+'_action.png', a)
+
         agent_de.stop_episode()
 
         I = np.maximum(0,label)
@@ -114,7 +117,6 @@ def main(fout):
     # model = net.cuda()
     model.load_state_dict(state_dict)
     model.eval()
-    current_state = State_de.State_de((TRAIN_BATCH_SIZE, 1, CROP_SIZE, CROP_SIZE), MOVE_RANGE, model)
 
     # load myfcn model
     model_el = MyFCN_el.MyFcn(N_ACTIONS)
