@@ -17,7 +17,10 @@ TESTING_DATA_PATH = "./data/low.txt"
 LABEL_DATA_PATH = "./data/high.txt"
 IMAGE_DIR_PATH = "./"
 SAVE_PATH = "./model/test_1"
-RESULT_PATH='./result_de/'
+RESULT_PATH='./result_'
+
+AGENT_EL_PATH='./ReLLIE/pretrained/model.npz'
+AGENT_DE_PATH='./ReLLIE/pretrained/init_denoising.npz'
 
 # _/_/_/ training parameters _/_/_/
 LEARNING_RATE = 0.0005
@@ -39,11 +42,14 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 GPU_ID = 0
 
 
-def test(loader1,loader2, agent_el, agent_de, fout, model):
+def test(loader1,loader2, agent_el, agent_de, fout, model, n=EPISODE_LEN):
     sum_psnr   = 0
     sum_reward = 0
+
     test_data_size = MiniBatchLoader.count_paths(TESTING_DATA_PATH)
-    os.makedirs(RESULT_PATH, exist_ok=True)
+
+    os.makedirs(RESULT_PATH + str(n), exist_ok=True)
+
     current_state = State_de.State_de((TEST_BATCH_SIZE, 1, CROP_SIZE, CROP_SIZE), MOVE_RANGE, model)
     for i in range(0, test_data_size, TEST_BATCH_SIZE):
         raw_x = loader1.load_testing_data(np.array(range(i, i+TEST_BATCH_SIZE)))
@@ -52,18 +58,19 @@ def test(loader1,loader2, agent_el, agent_de, fout, model):
         current_state.reset(raw_x)
         reward = np.zeros(raw_x.shape, raw_x.dtype)*255
 
-        for t in range(0, EPISODE_LEN):
+        for t in range(0, n):
             previous_image = current_state.image.copy()
 
             action_el = agent_el.act(current_state.image)
             current_state.step_el(action_el)
 
-            action_de = agent_de.act(current_state.image)
-            current_state.step_co(action_de)
+            action_co = agent_de.act(current_state.image)
+            current_state.step_co(action_co)
             
             if t > 4:
                 action_de = agent_de.act(current_state.image)
                 current_state.step_de(action_de)
+
             reward = np.square(label - previous_image)*255 - np.square(label - current_state.image)*255
             sum_reward += np.mean(reward)*np.power(GAMMA,t)
 
@@ -78,7 +85,7 @@ def test(loader1,loader2, agent_el, agent_de, fout, model):
         sum_psnr += cv2.PSNR(p, I)
         p = np.squeeze(p, axis=0)
         p = np.transpose(p, (1, 2, 0))
-        cv2.imwrite(RESULT_PATH + str(i) + '_output.png', p)
+        cv2.imwrite(RESULT_PATH + str(n) + "/" + str(i) + '_output.png', p)
     print("test total reward {a}, PSNR {b}".format(a=sum_reward*255/test_data_size, b=sum_psnr/test_data_size))
     fout.write("test total reward {a}, PSNR {b}\n".format(a=sum_reward*255/test_data_size, b=sum_psnr/test_data_size))
     sys.stdout.flush()
@@ -126,7 +133,7 @@ def main(fout):
     optimizer_el.setup(model_el)
 
     agent_el = pixelwise_a3c_el.PixelWiseA3C(model_el, optimizer_el, EPISODE_LEN, GAMMA)
-    pixelwise_a3c_el.chainer.serializers.load_npz('./ReLLIE/pretrained/model.npz', agent_el.model)
+    pixelwise_a3c_el.chainer.serializers.load_npz(AGENT_EL_PATH, agent_el.model)
     agent_el.act_deterministically = True
     agent_el.model.to_gpu()
 
@@ -139,11 +146,12 @@ def main(fout):
     optimizer_de.setup(model_de)
 
     agent_de = pixelwise_a3c_de.PixelWiseA3C(model_de, optimizer_de, EPISODE_LEN, GAMMA)
-    pixelwise_a3c_de.chainer.serializers.load_npz('./ReLLIE/pretrained/init_denoising.npz', agent_de.model)
+    pixelwise_a3c_de.chainer.serializers.load_npz(AGENT_DE_PATH, agent_de.model)
     agent_de.act_deterministically = True
     agent_de.model.to_gpu()
-
-    test(mini_batch_loader, mini_batch_loader_label, agent_el, agent_de, fout, model)
+    
+    for i in range(1, EPISODE_LEN + 1):
+        test(mini_batch_loader, mini_batch_loader_label, agent_el, agent_de, fout, model, i)
 
 
 if __name__ == '__main__':

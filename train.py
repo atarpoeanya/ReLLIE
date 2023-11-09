@@ -22,17 +22,21 @@ IMAGE_DIR_PATH = "./ReLLIE/"
 SAVE_PATH = "./model/train_1/"
 RESULT_PATH='./train_result/'
  
+
+
+AGENT_EL_PATH='./ReLLIE/pretrained/model.npz'
+AGENT_DE_PATH='./ReLLIE/pretrained/init_denoising.npz'
+IS_PRETRAINED=True
+
 #_/_/_/ training parameters _/_/_/ 
 LEARNING_RATE    = 0.001
 TRAIN_BATCH_SIZE = 64
 TEST_BATCH_SIZE  = 1 #must be 1
 N_EPISODES           = 30000
-EPISODE_LEN = 5
+EPISODE_LEN = 10
 SNAPSHOT_EPISODES  = 500
 TEST_EPISODES = 500
 GAMMA = 0.95 # discount factor
-
-#noise setting
 
 
 N_ACTIONS = 27
@@ -41,7 +45,7 @@ CROP_SIZE = 70
 
 # Loss multiplier
 W_SPA = 1
-W_EXP = 100
+W_EXP = 80
 W_TV = 200
 W_COL_RATE = 20
 #######################
@@ -82,7 +86,7 @@ def test(loader1,loader2, agent_el, agent_de,  fout, model):
             current_state.step_el(action_el)
             
             action_co = agent_de.act(current_state.image)
-            current_state.step_de(action_co)
+            current_state.step_co(action_co)
 
             action_de = agent_de.act(current_state.image)
             current_state.step_de(action_de)
@@ -105,7 +109,6 @@ def test(loader1,loader2, agent_el, agent_de,  fout, model):
     print("test total reward {a}, PSNR {b}".format(a=sum_reward*255/test_data_size, b=sum_psnr/test_data_size))
     fout.write("test total reward {a}, PSNR {b}\n".format(a=sum_reward*255/test_data_size, b=sum_psnr/test_data_size))
     sys.stdout.flush()
- 
  
 def main(fout):
     #_/_/_/ load dataset _/_/_/ 
@@ -155,6 +158,7 @@ def main(fout):
 
     agent_el = pixelwise_a3c_el.PixelWiseA3C(model_el, optimizer_el, EPISODE_LEN, GAMMA)
     # pixelwise_a3c.chainer.serializers.load_npz('./model/ex52_8000/model.npz', agent_el.model)
+    pixelwise_a3c_el.chainer.serializers.load_npz(AGENT_EL_PATH, agent_el.model)
     # agent_el.act_deterministically = True
     agent_el.model.to_gpu()
 
@@ -167,6 +171,7 @@ def main(fout):
     optimizer_de.setup(model_de)
 
     agent_de = pixelwise_a3c_de.PixelWiseA3C(model_de, optimizer_de, EPISODE_LEN, GAMMA)
+    pixelwise_a3c_de.chainer.serializers.load_npz(AGENT_DE_PATH, agent_de.model)
     agent_de.model.to_gpu()
 
     #_/_/_/ training _/_/_/
@@ -205,7 +210,7 @@ def main(fout):
             current_state.step_el(action_el)
 
             action_co = agent_de.act_and_train(current_state.image, reward_de)
-            current_state.step_de(action_co)
+            current_state.step_co(action_co)
 
             action_de = agent_de.act_and_train(current_state.image, reward_de)
             current_state.step_de(action_de)      

@@ -11,10 +11,6 @@ from torch.autograd import Variable
 import matplotlib.image as mpimg
 from PIL import Image, ImageStat
 
-def relu(x):
-        x_ = x.copy()
-        x_[x_<0] = 0
-        return x_
 
 class State_de():
     def __init__(self, size, move_range, model):
@@ -48,16 +44,19 @@ class State_de():
         self.image = 0.8 * moved_image + 0.2 * self.image
 
     def step_co(self, act_b):
-        pix_num = act_b.shape[1]
-        threshold = pix_num
+        
         bgr_t = np.transpose(self.image, (0,2,3,1))
         temp3 = np.zeros(bgr_t.shape, bgr_t.dtype)
         batch_num, c, h, w = self.image.shape
-        clahe = cv2.createCLAHE(clipLimit=0.015, tileGridSize=(8,8))
+        limit=0.015
         # BGR channel deconvolution
         
         for i in range(0, batch_num):
-                
+                if np.sum(act_b[i]==3) > 0:
+                    clahe = cv2.createCLAHE(clipLimit=limit, tileGridSize=(8,8))
+                if np.sum(act_b[i]==4) > 0:
+                    clahe = cv2.createCLAHE(clipLimit=0.2, tileGridSize=(8,8))
+
                 temp = cv2.cvtColor(bgr_t[i], cv2.COLOR_BGR2HSV)
 
                 v_channel = (temp[...,2]*255).astype(np.uint8)
@@ -75,8 +74,8 @@ class State_de():
         self.image = bgr3
 
     def step_de(self, act_b):
-        pix_num = act_b.shape[1]*act_b.shape[2]
-        threshold = pix_num
+        # pix_num = act_b.shape[1]*act_b.shape[2]
+        # threshold = pix_num
         checker = act_b.sum(1)
         checker = checker.sum(1)
         for i in range(len(checker)):
@@ -111,11 +110,12 @@ class State_de():
             nsigma.astype('int')
             nsigma = nsigma[:, :, ::2, ::2]
 
-            # Test mode
-            with torch.no_grad():  # PyTorch v0.4.0
-                imorig = Variable(imorig.type(dtype))
-                nsigma = Variable(
-                    torch.FloatTensor(nsigma).type(dtype))
+            # # Test mode
+            # with torch.no_grad():  # PyTorch v0.4.0
+            #     imorig = Variable(imorig.type(dtype))
+            #     nsigma = Variable(
+            #         torch.FloatTensor(nsigma).type(dtype))
+            
             # Estimate noise and subtract it to the input image
             im_noise_estim = self.net(imorig, nsigma)
             outim = torch.clamp(imorig - im_noise_estim, 0., 1.)
